@@ -12,12 +12,14 @@ Approch: Travelling salesman problem
 '''
 import json
 from sys import maxsize
+from itertools import permutations
+
 
 def tsp(graph, s, V):
     visited = [False] * V
     visited[s] = True
     path = ["r0"]  # Start with the restaurant
-
+    path.append('n'+str(13))
     for _ in range(V - 1):
         min_dist = maxsize
         next_vertex = -1
@@ -30,25 +32,40 @@ def tsp(graph, s, V):
         s = next_vertex
     
     path.append("r0")  # Return to the restaurant
-    
-    return path
+    if sum(visited) != V:
+        print("error")
+    else:
+        return path
+
 
 if __name__ == "__main__":
     #reading input file
-    with open(r"C:\Student Handout\Input data\level0.json", "r") as file:
+    with open("LEVEL 0\level0.json", "r") as file:
         data = json.load(file)
     
     restaurant_data = data['restaurants']['r0']
     neighborhood_distances = restaurant_data['neighbourhood_distance']
     n_neighborhoods = len(neighborhood_distances)
+    print(n_neighborhoods)
+
+    neighbourhood_distances = data["restaurants"]["r0"]["neighbourhood_distance"]
+
+    graph = []
+    graph.append(neighborhood_distances)
 
     # Convert the neighborhood distances into a 2D matrix format.
-    graph = [[0 if i == j else neighborhood_distances[j] for j in range(n_neighborhoods)] for i in range(n_neighborhoods)]
-    
+    g = [[0 if i == j else neighborhood_distances[j] for j in range(n_neighborhoods)] for i in range(n_neighborhoods)]
+    print(g)
     #restaurant at index 0
-    s = 0 
-    path = tsp(graph, s, n_neighborhoods)
+    s = 0
+    min = maxsize
+    for i in range(len(neighborhood_distances)):
+        if(neighborhood_distances[i] < min):
+            min = neighborhood_distances[i]
+            s = i
     
+    path = tsp(g, s, n_neighborhoods)
+    print(path)
     #dict to store in json file
     output_data = {
         "v0": {
@@ -57,5 +74,5 @@ if __name__ == "__main__":
     }
 
     # output data to a JSON file
-    with open("LEVEL 0\output.json", "w") as outfile:
-        json.dump(output_data, outfile, indent=4)
+    with open("LEVEL 0\level0_output.json", "w") as outfile:
+        json.dump(output_data, outfile)
